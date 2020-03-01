@@ -3,7 +3,8 @@ provider "aws" {
 }
 
 module "webserver_cluster" {
-	source						= "../../../modules/services/webserver-cluster"
+	//source						= "../../../modules/services/webserver-cluster"
+	source					= "github.com/natthompson/terraform-up-and-running-modules//services/webserver-cluster?ref=v0.0.1"
 
 	cluster_name				= "webservers_stage"
 	db_remote_state_bucket		= "com.natthompson.terraform-up-and-running-state-2ed"
@@ -13,16 +14,14 @@ module "webserver_cluster" {
 	max_size					= 2
 }
 
-resource "aws_autoscaling_schedule" {
-	"scale_out_during_business_hours" {
-		scheduled_action_name	= "scale-out-during-business-hours"
-		min_size				= 2
-		max_size				= 10
-		desired_capacity		= 10
-		recurrence				= "0 9 * * *"
+resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
+	scheduled_action_name	= "scale-out-during-business-hours"
+	min_size				= 2
+	max_size				= 10
+	desired_capacity		= 10
+	recurrence				= "0 9 * * *"
 
-		autoscaling_group_name	= module.webserver_cluster.asg_name
-	}
+	autoscaling_group_name	= module.webserver_cluster.asg_name
 }
 
 resource "aws_autoscaling_schedule" "scale_in_at_night" {
